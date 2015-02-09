@@ -17,6 +17,38 @@
 			border: 1px solid #CCCCCC;
 			vertical-align:middle; margin-bottom: 3px;
 		}
+
+		#textBox{
+			border: 2px solid rgb(96, 96, 109);
+			height: 80px;
+			border-radius: 1px;
+			background-color: #FFDFB8;
+			color: black;
+		}
+
+		.tabs{
+			background-color: #6F2903;
+			color: black;
+			width: 60px;
+			display: inline-block; 
+			border: 2px solid black;
+			border-bottom: 2px solid rgb(96, 96, 109);
+			border-top-left-radius: 5px;
+			border-top-right-radius: 5px;
+			margin: -2px;
+			padding: 0px;
+		}
+
+		.tabs h3 {
+			padding: 7px;
+			margin: auto;
+		}
+
+		.active {
+			background-color: #FF8837;
+		}
+
+		
 	</style>
 </head>
 <body>	
@@ -40,23 +72,48 @@
 		<hr/>
 
 		<div id="container">
-			Turn this content into a tabbed container.
 
-			<h3>Tab 1</h3>
-			<p>
-				Gingerbread muffin gummies gingerbread macaroon. Lollipop candy applicake toffee faworki. Bear claw topping jelly toffee toffee powder tiramisu candy chupa chups. Chupa chups dragee icing applicake chupa chups dessert. Croissant jelly faworki marzipan tootsie roll marshmallow. Marshmallow toffee sweet roll fruitcake.
-			</p>
+			<div>
+				<div class="tabs 1 active" onclick="loadText(1)"><h3>Tab 1</h3></div>
+				<div class="tabs 2" onclick="loadText(2)"><h3>Tab 2</h3></div>
+				<div class="tabs 3" onclick="loadText(3)"><h3>Tab 3</h3></div>
+			</div>
 
-			<h3>Tab 2</h3>
-			<p>
-				Chocolate faworki croissant brownie halvah macaroon gummi bears wypas. Chupa chups icing gummies pudding dessert carrot cake. Cupcake jelly beans sweet roll icing ice cream apple pie tootsie roll gummi bears marzipan. Brownie gummies chupa chups pie. Cupcake jujubes topping. 
-			</p>
-
-			<h3>Tab 3</h3>
-			<p>
-				Cheesecake jelly beans ice cream lollipop sweet pastry. Chupa chups dessert cheesecake sesame snaps. Cookie ice cream candy canes pastry cake muffin. Icing chocolate sweet gummi bears powder oat cake oat cake lemon drops.
-			</p>
+			
+			<div id='textBox'>
+				<p class="text">
+					
+				</p>
+			</div>
 		</div>
 	</div>
+
+	<script>
+
+	//populate tabText array with text.
+	var tabText = [];
+	tabText.push('Gingerbread muffin gummies gingerbread macaroon. Lollipop candy applicake toffee faworki. Bear claw topping jelly toffee toffee powder tiramisu candy chupa chups. Chupa chups dragee icing applicake chupa chups dessert. Croissant jelly faworki marzipan tootsie roll marshmallow. Marshmallow toffee sweet roll fruitcake.');
+
+	tabText.push('Chocolate faworki croissant brownie halvah macaroon gummi bears wypas. Chupa chups icing gummies pudding dessert carrot cake. Cupcake jelly beans sweet roll icing ice cream apple pie tootsie roll gummi bears marzipan. Brownie gummies chupa chups pie. Cupcake jujubes topping. ');
+
+	tabText.push('Cheesecake jelly beans ice cream lollipop sweet pastry. Chupa chups dessert cheesecake sesame snaps. Cookie ice cream candy canes pastry cake muffin. Icing chocolate sweet gummi bears powder oat cake oat cake lemon drops.');
+
+	//set up default text (for tab 1)
+	document.getElementsByClassName('text')[0].innerHTML = tabText[0];
+
+	//1. reset all tabs to their dault class
+	//2. set new tab class to active.
+	var loadText = function(tab){
+		var tabName = document.getElementsByClassName('active')[0].className;
+		tabName = tabName.slice(0, 6);
+		document.getElementsByClassName('active')[0].className = tabName;
+
+		document.getElementsByClassName('tabs ' + tab)[0].className += ' active';
+		document.getElementsByClassName('text')[0].innerHTML = tabText[tab - 1];
+	}
+	
+
+
+	</script>
 </body>
 </html>

@@ -1,59 +1,214 @@
 <!doctype html>
 <html>
 <head>
-	<title>Frontend Coding Test</title>
-	<link type="text/css" rel="stylesheet" href="../css/style.css" />
-	<style type="text/css">
-		#rotator {
-			width: 450px;
-			height: 300px;
-			border: 1px solid black;
-			background: #aaa;
-			text-align: center;
-		}
-	</style>
+    <title>Frontend Coding Test</title>
+    <link type="text/css" rel="stylesheet" href="../css/style.css" />
+    <style type="text/css">
+
+        #rotator {
+            width: 450px;
+            height: 300px;
+            border: 1px solid black;
+            text-align: center;
+            background-color: #131313;
+        }
+
+        #rotatorItems{
+            position: relative;
+            margin-top: 0;
+            padding:0;
+        }
+
+        .image-slider-wrapper{
+            overflow: hidden;
+        }
+
+        .rotateImg{
+            margin-top: -5%;
+        }
+
+        .rotateHeader{
+            margin-bottom: 7%;
+            margin-top: 2%;
+        }
+
+        .rotateDescrip{
+            height: 7.1%;
+            width: 100%;
+            text-align: left;
+            margin-left: 2%;
+        }
+
+        .descripBox{
+            position: relative;
+            background-color:rgba(0, 0, 0, 0.5);
+            width: 100%;
+            height: 35px;
+            margin-top: -11.5%
+        }
+
+        li{
+            max-width: 450px;
+            float:left;
+            list-style: none;
+        }
+        
+    </style>
 </head>
 <body>
-	<div id="headwrap">
-	<div class="head">
-		<div class="logo">Riot Games</div>
-	</div>
+    <div id="headwrap">
+    <div class="head">
+        <div class="logo">Riot Games</div>
+    </div>
 </div>
 
 <div id="content">
-	<h1><span class="red">Image</span> Rotator</h1>
+    <h1><span class="red">Image</span> Rotator</h1>
 
-	<p>
-		Using the below images, make a rotator in the box below that shows only one of the Katarina skins every 3 seconds.  The rotator should also display the correct image title and description with each image change.
-	</p>
-	<p>
-		It would be really awesome if the slides animated between one another!
-	</p>
+    <p>
+        Using the below images, make a rotator in the box below that shows only one of the Katarina skins every 3 seconds.  The rotator should also display the correct image title and description with each image change.
+    </p>
+    <p>
+        It would be really awesome if the slides animated between one another!
+    </p>
 
-	<hr />
+    <hr />
 
-	<h4>Katarina</h4>
-	<p>Fruitcake bonbon donut jelly-o brownie biscuit marzipan pie.</p>
-	<img src="../img/kat_1.jpg" /><br/>
+    <h4>Katarina</h4>
+    <p>Fruitcake bonbon donut jelly-o brownie biscuit marzipan pie.</p>
+    <img src="../img/kat_1.jpg" /><br/>
 
-	<h4>Red Card Katarina</h4>
-	<p>Cheesecake marzipan cupcake biscuit candy canes pudding.</p>
-	<img src="../img/kat_2.jpg" /><br/>
+    <h4>Red Card Katarina</h4>
+    <p>Cheesecake marzipan cupcake biscuit candy canes pudding.</p>
+    <img src="../img/kat_2.jpg" /><br/>
 
-	<h4>Kitty Cat Katarina</h4>
-	<p>Applicake topping halvah lemon drops wypas cotton candy.</p>
-	<img src="../img/kat_3.jpg" /><br/>
+    <h4>Kitty Cat Katarina</h4>
+    <p>Applicake topping halvah lemon drops wypas cotton candy.</p>
+    <img src="../img/kat_3.jpg" /><br/>
 
-	<h4>High Command Katarina</h4>
-	<p>Oat cake macaroon souffle cupcake chupa chups chocolate bar bear claw dragee lemon drops.</p>
-	<img src="../img/kat_4.jpg" /><br/>
+    <h4>High Command Katarina</h4>
+    <p>Oat cake macaroon souffle cupcake chupa chups chocolate bar bear claw dragee lemon drops.</p>
+    <img src="../img/kat_4.jpg" /><br/>
 
-	<hr/>
+    <hr/>
 
-	<div id="rotator">
-		Rotator Here
-	</div>
+    <div id="rotator">
+        
+        <div class="image-slider-wrapper">
+            <!-- There are a ton of tutorials on this one. Just look one up! -->
+            <ul id="rotatorItems">
+                <li><h4 class='rotateHeader'>Katarina</h4> <img class='rotateImg' src='../img/kat_1.jpg' border='0' /> <div class="descripBox"><p class='rotateDescrip'>Fruitcake bonbon donut jelly-o brownie biscuit marzipan pie.</p> </div></li>
+                <li><h4 class='rotateHeader'>Red Card Katarina</h4>  <img class='rotateImg' src='../img/kat_2.jpg' border='0' /> <div class="descripBox"> <p class='rotateDescrip'>Cheesecake marzipan cupcake biscuit candy canes pudding.</p></div></li>
+                <li><h4 class='rotateHeader'>Kitty Cat Katarina</h4>  <img class='rotateImg' src='../img/kat_3.jpg' border='0' /> <div class="descripBox"> <p class='rotateDescrip'>Applicake topping halvah lemon drops wypas cotton candy.</p></div></li>
+                <li><h4 class='rotateHeader'>High Command Katarina</h4> <img class='rotateImg' src='../img/kat_4.jpg' border='0' /> <div class="descripBox"><p class='rotateDescrip'>Oat cake macaroon souffle cupcake chupa chups chocolate bar bear claw dragee lemon drops.</p></div></li>
+            </ul>           
+        </div>
+    </div>
 </div>
+
+<script>
+
+//Declare all necessary variables
+var ul;
+var li_items; 
+var li_number;
+var image_number = 0;
+var slider_width = 0;
+var image_width;
+var current = 0;
+
+//Initial set up function for rotator.
+function start(){   
+    ul = document.getElementById('rotatorItems');
+    li_items = ul.children;
+    li_number = li_items.length;
+
+    //Define rotator image limits (how far it can actually slide)
+    for (i = 0; i < li_number; i++){
+        image_width = li_items[i].childNodes[0].clientWidth;
+        slider_width += image_width;
+        image_number++;
+    }
+    
+    //Sets width of unordered list so that all images can fit.
+    ul.style.width = slider_width + 'px';
+    //Start rotation
+    slider();
+}
+
+//Rotation function
+function slider(){  
+
+        //Invoking the animation function.
+        animate({
+            delay:10,
+            duration: 2000,
+            //for constant transitions, just an extra.
+            // delta:function(p){return Math.max(0, -1 + 2 * p)}, 
+            delta: function(progress) {return 1 - Math.sin(Math.acos(progress))},
+
+            step:
+            function(delta){
+                    ul.style.left = '-' + parseInt(current * image_width + delta * image_width) + 'px';
+                },
+
+            //callback to continue the process.
+            callback:function(){
+                current++;
+                if(current < li_number-1){
+                    setTimeout(function(){slider()}, 3000);
+                }
+                else{
+                    var left = (li_number - 1) * image_width;                   
+                    setTimeout(function(){goBack(left)},2000);              
+                    setTimeout(slider, 4000);
+                }
+            }
+        });
+}
+
+//The function for returning to starting image.
+function goBack(origin){
+    current = 0;    
+    setInterval(function(){
+        if(origin >= 0){
+            ul.style.left = '-' + origin + 'px';
+            origin -= image_width / 10;
+        }   
+    }, 10);
+}
+
+//Runs calculations for animations
+function animate(options){
+    var start = new Date;
+
+    var id = setInterval(function(){
+
+        //Define when a cycle should be finished
+        var timePassed = new Date - start;
+        var progress = timePassed / options.duration;
+        if(progress > 1){
+            progress = 1;
+        }
+
+        //Define the rate of change of transition.
+        var delta = options.delta(progress);
+        options.step(delta);
+        if (progress == 1){
+            clearInterval(id);
+            options.callback();
+        }
+
+    }, options.delay);
+}
+
+//Onload run start function.
+window.onload = start;
+
+</script>
 
 </body>
 </html>
+
+
+
