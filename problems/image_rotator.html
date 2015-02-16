@@ -115,23 +115,19 @@ var li_number;
 var image_number = 0;
 var slider_width = 0;
 var image_width;
-var current = 0;
+var current_image = 0;
 
 //Initial set up function for rotator.
 function start(){   
     ul = document.getElementById('rotatorItems');
     li_items = ul.children;
-    li_number = li_items.length;
 
     //Define rotator image limits (how far it can actually slide)
-    for (i = 0; i < li_number; i++){
-        image_width = li_items[i].childNodes[0].clientWidth;
-        slider_width += image_width;
-        image_number++;
-    }
-    
-    //Sets width of unordered list so that all images can fit.
-    ul.style.width = slider_width + 'px';
+    image_number = li_items.length;
+    image_width = li_items[0].childNodes[0].clientWidth; //all the images are the same width
+
+    ul.style.width = parseInt(image_width * image_number) + 'px'; 
+
     //Start rotation
     slider();
 }
@@ -149,13 +145,13 @@ function slider(){
 
             step:
             function(delta){
-                    ul.style.left = '-' + parseInt(current * image_width + delta * image_width) + 'px';
+                    ul.style.left = '-' + parseInt(current_image * image_width + delta * image_width) + 'px';
                 },
 
             //callback to continue the process.
             callback:function(){
-                current++;
-                if(current < li_number-1){
+                current_image++;
+                if(current_image < li_number-1){
                     setTimeout(function(){slider()}, 3000);
                 }
                 else{
@@ -169,7 +165,7 @@ function slider(){
 
 //The function for returning to starting image.
 function goBack(origin){
-    current = 0;    
+    current_image = 0;    
     setInterval(function(){
         if(origin >= 0){
             ul.style.left = '-' + origin + 'px';
