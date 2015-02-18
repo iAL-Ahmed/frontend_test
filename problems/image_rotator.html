@@ -52,6 +52,54 @@
             float:left;
             list-style: none;
         }
+
+        /*.navigation{
+            position:absolute;
+            top: 120px;
+            height: 50px;
+            width: 30px;
+            opacity: 0.6;
+        }*/
+        .navigation:hover{
+            opacity: 0.9;
+        }
+
+        #pager{
+            /* firefox has different center method. this doesn't work for fire fox */
+            /* not in the center*/
+            padding:0px;
+            position:relative;
+            height:50px;
+            width: 100px;
+            margin:auto;
+            margin-top:10px;
+        }
+
+        #pager li{
+            padding: 0px;
+            margin:5px;
+            width:20px;
+            height:20px;
+            border:1px solid white;
+            color:white;
+            list-style: none;
+            opacity: 0.6;
+            float:left;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #pager li:hover{
+            opacity:0.9;
+        }
+
+        #controls{
+            max-width: 450px;
+            height: 50px;
+            padding-left: 140px;
+        }
+        #controls div{
+            float: left;
+        }
         
     </style>
 </head>
@@ -101,8 +149,17 @@
                 <li><h4 class='rotateHeader'>Red Card Katarina</h4>  <img class='rotateImg' src='../img/kat_2.jpg' border='0' /> <div class="descripBox"> <p class='rotateDescrip'>Cheesecake marzipan cupcake biscuit candy canes pudding.</p></div></li>
                 <li><h4 class='rotateHeader'>Kitty Cat Katarina</h4>  <img class='rotateImg' src='../img/kat_3.jpg' border='0' /> <div class="descripBox"> <p class='rotateDescrip'>Applicake topping halvah lemon drops wypas cotton candy.</p></div></li>
                 <li><h4 class='rotateHeader'>High Command Katarina</h4> <img class='rotateImg' src='../img/kat_4.jpg' border='0' /> <div class="descripBox"><p class='rotateDescrip'>Oat cake macaroon souffle cupcake chupa chups chocolate bar bear claw dragee lemon drops.</p></div></li>
-            </ul>           
+            </ul>  
         </div>
+        
+        <div id="controls">
+            <div class="navigation" id="back"> &lt;&lt;&lt; </div>
+
+            <div><ul id="pager"></ul></div>
+
+            <div class="navigation" id="forward"> &gt;&gt;&gt; </div> 
+        </div>
+
     </div>
 </div>
 
@@ -111,74 +168,58 @@
 //Declare all necessary variables
 var ul;
 var li_items; 
-var li_number;
 var image_number = 0;
-var slider_width = 0;
 var image_width;
 var current_image = 0;
+var prev, next; //the arrow buttons
+var auto_slider_timer;
+var animation_in_progress = false;
+
 
 //Initial set up function for rotator.
 function start(){   
     ul = document.getElementById('rotatorItems');
     li_items = ul.children;
-
+ 
     //Define rotator image limits (how far it can actually slide)
     image_number = li_items.length;
-    image_width = li_items[0].childNodes[0].clientWidth; //all the images are the same width
+    image_width = li_items[0].childNodes[0].clientWidth; 
+    
+    //Sets width of unordered list so that all images can fit.
+    ul.style.width =(image_width * image_number) + 'px';
 
-    ul.style.width = parseInt(image_width * image_number) + 'px'; 
+    //generate the number buttons on page based on how many total images there are.
+    generate_pager(image_number);
 
-    //Start rotation
-    slider();
+    //arrow buttons
+    prev = document.getElementById("back"); 
+    next = document.getElementById("forward");
+    prev.onclick = function(){ onClickPrev();};
+    next.onclick = function(){ onClickNext();};
+    
+    //Start rotation 
+    auto_slider();
+    
 }
 
-//Rotation function
-function slider(){  
+//Starts the auto rotation of images, once ever 3 sec
+function auto_slider(){  
 
-        //Invoking the animation function.
-        animate({
-            delay:10,
-            duration: 2000,
-            //for constant transitions, just an extra.
-            // delta:function(p){return Math.max(0, -1 + 2 * p)}, 
-            delta: function(progress) {return 1 - Math.sin(Math.acos(progress))},
-
-            step:
-            function(delta){
-                    ul.style.left = '-' + parseInt(current_image * image_width + delta * image_width) + 'px';
-                },
-
-            //callback to continue the process.
-            callback:function(){
-                current_image++;
-                if(current_image < li_number-1){
-                    setTimeout(function(){slider()}, 3000);
-                }
-                else{
-                    var left = (li_number - 1) * image_width;                   
-                    setTimeout(function(){goBack(left)},2000);              
-                    setTimeout(slider, 4000);
-                }
-            }
-        });
-}
-
-//The function for returning to starting image.
-function goBack(origin){
-    current_image = 0;    
-    setInterval(function(){
-        if(origin >= 0){
-            ul.style.left = '-' + origin + 'px';
-            origin -= image_width / 10;
-        }   
-    }, 10);
+        //Auto sliding of images
+        auto_slider_timer = setInterval(function(){
+            onClickNext();
+        }, 3000);
 }
 
 //Runs calculations for animations
 function animate(options){
+
     var start = new Date;
 
     var id = setInterval(function(){
+
+        //fail safe so animations cannot double up.
+        animation_in_progress = true;
 
         //Define when a cycle should be finished
         var timePassed = new Date - start;
@@ -193,10 +234,93 @@ function animate(options){
         if (progress == 1){
             clearInterval(id);
             options.callback();
+
+            animation_in_progress = false;
         }
 
     }, options.delay);
+
 }
+
+function slideTo(imageToGo){
+    if(!animation_in_progress){
+        clearInterval(auto_slider_timer);
+
+        var direction;
+        var numOfImageToGo = Math.abs(imageToGo - current_image);
+        // slide toward left
+
+        direction = current_image > imageToGo ? 1 : -1;
+        currentPostion = -1 * current_image * image_width;
+        var opts = {
+            delay:10,
+            duration: 1500,
+
+            //Additional transitions just incase you want something different.
+            // delta:function(p){return Math.max(0, -1 + 2 * p)}, //constant
+            // delta: function(progress) {return 1 - Math.sin(Math.acos(progress))}, //circular
+            delta: function(progress) {return Math.pow(progress, 3)},
+
+            step:function(delta){
+                ul.style.left = parseInt(currentPostion + direction * delta * image_width * numOfImageToGo) + 'px';
+            },
+            callback:function(){
+                current_image = imageToGo;
+
+                //start the auto rotation again so transitions don't happen after landing on new image.
+                auto_slider(); 
+            }  
+        };
+
+        animate(opts);
+
+    }
+}
+
+function onClickPrev(){
+
+    if (current_image == 0){
+        slideTo(image_number - 1);
+    }       
+    else{
+        slideTo(current_image - 1);
+    }       
+}
+
+function onClickNext(){
+    if (current_image == image_number - 1){
+        slideTo(0);
+    }       
+    else{
+        slideTo(current_image + 1);
+    }       
+}
+
+function generate_pager(imageNumber){    
+    var page_number;
+    var pager_div = document.getElementById('pager');
+    for (i = 0; i < imageNumber; i++){
+        var li = document.createElement('li');
+        page_number = document.createTextNode(parseInt(i + 1));
+        li.appendChild(page_number);
+        pager_div.appendChild(li);
+        // add event inside a loop, closure issue.
+        li.onclick = function(i){
+            return function(){
+                slideTo(i);
+            }
+        }(i);
+    }   
+
+    //compute the positioning of the pager.
+    var computedStyle = document.defaultView.getComputedStyle(li, null); //returns an object of all styling for that object
+    //border width 1px; offsetWidth = 22
+    var liWidth = parseInt(li.offsetWidth); //grabs the width of the last li added to width
+    var liMargin = parseInt(computedStyle.margin.replace('px',"")); //returns a string of the margin style of that element
+    pager_div.style.width = parseInt((liWidth + liMargin * 2) * imageNumber) + 'px'; //calculates the total needed width of the pager
+}
+
+
 
 //Onload run start function.
 window.onload = start;
