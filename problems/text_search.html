@@ -3,6 +3,13 @@
 <head>
     <title>Frontend Coding Test | Text Search</title>
     <link type="text/css" rel="stylesheet" href="../css/style.css" />
+    <style type="text/css">
+
+        .highlight {
+            color:yellow;
+        }
+
+    </style>
 </head>
 <body>
     <div id="headwrap">
@@ -60,6 +67,7 @@
     <script>
         //space is added at the front in the event you should want to look explicitly for full words
         var text = " "; 
+        var original_HTML = [];
 
         //On load grab the searchable text
         var start = function(){
@@ -68,16 +76,17 @@
         }
         
         //1. Grab text from input field
-        //2. Set input to all lowercase to make search case-insensitive
-        //3. Use regex to scan search text
-        //4. Output results
+        //2. Use regex to scan search text
+        //3. Output results
         var search = function(){            
             var input = document.getElementById('search_input').value;
-            input = input.toLowerCase();
+
+            console.log(text.match(new RegExp(input, "gi")) || []);
 
             //assuming you want to be sure a word is a word and not just a partial you could just add spaces on both
             //sides of input.                     vvvv-here
-            var numOccur = (text.match(new RegExp(input, "g")) || []).length
+            var numOccur = (text.match(new RegExp(input, "gi")) || []).length;
+            highlight(input);
 
             document.getElementById('results').innerHTML = 'Found ' + numOccur + ' occurances of the word "' + input + '" in the below text.'
         }
@@ -85,10 +94,37 @@
         //Parses out text for searching and lowercases it (search is now case-insensitive).
         var getText = function(elements) {
             for(var i = 0; i < elements.length; i++) {
+                //makes a backup copy of the inner html for reseting
+                original_HTML[i] = elements[i].innerHTML;
                 text += elements[i].textContent;
             }
 
-            text = text.toLowerCase();
+        }
+
+        //Highlighting system to highlight where in the search text the word is. This does NOT affect existing HTML
+        var highlight = function(input){
+
+            //gather each p tag for processing
+            var html_text = document.getElementById('search_text').children;
+            var search_results; 
+
+            //loop through each p tags
+            for(var i = 0; i < html_text.length; i++) {
+
+                //reset the inner html so old highlights are removed
+                html_text[i].innerHTML = original_HTML[i];
+
+                //case insensitively find the word you are looking for. "Turtle" is the same as "turtle"
+                //does a look ahead for to see if is inside HTML tag or not        vvvvvvvvv
+                search_results = html_text[i].innerHTML.match(new RegExp(input + "(?![^<>]*>)", "gi")) || [];
+
+                //for each instance of the word found, replace it with a highlighted version of itself.
+                for(var j = 0; j < search_results.length; j++){
+                    html_text[i].innerHTML = html_text[i].innerHTML.replace(new RegExp(search_results[j] + "(?![^<>]*>)", "g") , "<span class='highlight'>" + search_results[j] + "</span>");
+                }
+                
+            }
+
         }
 
         //onload run start function

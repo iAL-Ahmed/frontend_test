@@ -8,9 +8,19 @@
         #rotator {
             width: 450px;
             height: 300px;
-            border: 1px solid black;
             text-align: center;
-            background-color: #131313;
+            background: linear-gradient(#131313, rgba(27, 48, 85, 0.28), #131313);
+            border-top: 3px groove;
+            border-left: 3px groove;
+            border-right: 3px groove;
+            padding-bottom: 36px;
+            padding-left: 36px;
+            padding-right: 36px;
+            border-bottom-left-radius: 112px;
+            border-bottom-right-radius: 112px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border-color: rgba(71, 45, 0, 0.64);
         }
 
         #rotatorItems{
@@ -53,26 +63,21 @@
             list-style: none;
         }
 
-        /*.navigation{
-            position:absolute;
-            top: 120px;
-            height: 50px;
-            width: 30px;
+        .navigation{
+            color: #ED982E;
             opacity: 0.6;
-        }*/
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
         .navigation:hover{
             opacity: 0.9;
         }
 
         #pager{
-            /* firefox has different center method. this doesn't work for fire fox */
-            /* not in the center*/
             padding:0px;
             position:relative;
-            height:50px;
-            width: 100px;
-            margin:auto;
-            margin-top:10px;
+            margin: 0px auto auto;
         }
 
         #pager li{
@@ -80,8 +85,8 @@
             margin:5px;
             width:20px;
             height:20px;
-            border:1px solid white;
-            color:white;
+            border:2px solid #ED982E;
+            color: #ED982E;
             list-style: none;
             opacity: 0.6;
             float:left;
@@ -94,11 +99,20 @@
 
         #controls{
             max-width: 450px;
-            height: 50px;
-            padding-left: 140px;
         }
+
+        #bar {
+            border-right: 3px groove;
+            border-left: 3px groove;
+            border-bottom: 3px groove;
+            border-radius: 33px;
+            padding-right: 7px;
+            padding-left: 7px;
+            border-color: rgba(161, 164, 164, 0.41);
+        }
+
         #controls div{
-            float: left;
+            display: inline-flex;
         }
         
     </style>
@@ -143,7 +157,6 @@
     <div id="rotator">
         
         <div class="image-slider-wrapper">
-            <!-- There are a ton of tutorials on this one. Just look one up! -->
             <ul id="rotatorItems">
                 <li><h4 class='rotateHeader'>Katarina</h4> <img class='rotateImg' src='../img/kat_1.jpg' border='0' /> <div class="descripBox"><p class='rotateDescrip'>Fruitcake bonbon donut jelly-o brownie biscuit marzipan pie.</p> </div></li>
                 <li><h4 class='rotateHeader'>Red Card Katarina</h4>  <img class='rotateImg' src='../img/kat_2.jpg' border='0' /> <div class="descripBox"> <p class='rotateDescrip'>Cheesecake marzipan cupcake biscuit candy canes pudding.</p></div></li>
@@ -153,11 +166,13 @@
         </div>
         
         <div id="controls">
-            <div class="navigation" id="back"> &lt;&lt;&lt; </div>
+            <div id="bar">
+                <div class="navigation" id="back"> &lt;&lt;&lt; </div>
 
-            <div><ul id="pager"></ul></div>
+                <div><ul id="pager"></ul></div>
 
-            <div class="navigation" id="forward"> &gt;&gt;&gt; </div> 
+                <div class="navigation" id="forward"> &gt;&gt;&gt; </div>
+            </div> 
         </div>
 
     </div>
@@ -174,6 +189,7 @@ var current_image = 0;
 var prev, next; //the arrow buttons
 var auto_slider_timer;
 var animation_in_progress = false;
+var pager_children;
 
 
 //Initial set up function for rotator.
@@ -191,11 +207,11 @@ function start(){
     //generate the number buttons on page based on how many total images there are.
     generate_pager(image_number);
 
-    //arrow buttons
+    //arrow buttons and onclick bindings
     prev = document.getElementById("back"); 
     next = document.getElementById("forward");
-    prev.onclick = function(){ onClickPrev();};
-    next.onclick = function(){ onClickNext();};
+    prev.onclick = function(){ previous_image();};
+    next.onclick = function(){ next_image();};
     
     //Start rotation 
     auto_slider();
@@ -205,9 +221,9 @@ function start(){
 //Starts the auto rotation of images, once ever 3 sec
 function auto_slider(){  
 
-        //Auto sliding of images
+        //Auto sliding of images using the next image function
         auto_slider_timer = setInterval(function(){
-            onClickNext();
+            next_image();
         }, 3000);
 }
 
@@ -242,16 +258,28 @@ function animate(options){
 
 }
 
+//slides to the specified image
 function slideTo(imageToGo){
+
+    //Check if animation is in progress before starting another. This is to prevent interval conflicts.
     if(!animation_in_progress){
+        //stop the auto interval to later restart timer once the user lands on specified image.
         clearInterval(auto_slider_timer);
+
+        //set highlights for pager buttons. If on image 0 highlight first pager button
+        pager_children[current_image].style.opacity = "0.6";
+        pager_children[imageToGo].style.opacity = "0.9";
 
         var direction;
         var numOfImageToGo = Math.abs(imageToGo - current_image);
-        // slide toward left
 
+        //define which direction to slide. If the desired image is greater, slide left (negative)
         direction = current_image > imageToGo ? 1 : -1;
-        currentPostion = -1 * current_image * image_width;
+        
+        //specify spatially what image you are on
+        var currentPostion = -1 * current_image * image_width;
+
+        //configure the options for animating
         var opts = {
             delay:10,
             duration: 1500,
@@ -272,12 +300,14 @@ function slideTo(imageToGo){
             }  
         };
 
+        //start animation
         animate(opts);
 
     }
 }
 
-function onClickPrev(){
+//function to slide back an image.
+function previous_image(){
 
     if (current_image == 0){
         slideTo(image_number - 1);
@@ -287,7 +317,8 @@ function onClickPrev(){
     }       
 }
 
-function onClickNext(){
+//function to slide forward an image
+function next_image(){
     if (current_image == image_number - 1){
         slideTo(0);
     }       
@@ -296,14 +327,19 @@ function onClickNext(){
     }       
 }
 
-function generate_pager(imageNumber){    
+//function dynamically generates a pager with a button for each image
+function generate_pager(imageNumber){ 
+
     var page_number;
     var pager_div = document.getElementById('pager');
+
+    //looping to create a button for each image.
     for (i = 0; i < imageNumber; i++){
         var li = document.createElement('li');
         page_number = document.createTextNode(parseInt(i + 1));
         li.appendChild(page_number);
         pager_div.appendChild(li);
+
         // add event inside a loop, closure issue.
         li.onclick = function(i){
             return function(){
@@ -313,13 +349,23 @@ function generate_pager(imageNumber){
     }   
 
     //compute the positioning of the pager.
-    var computedStyle = document.defaultView.getComputedStyle(li, null); //returns an object of all styling for that object
-    //border width 1px; offsetWidth = 22
-    var liWidth = parseInt(li.offsetWidth); //grabs the width of the last li added to width
-    var liMargin = parseInt(computedStyle.margin.replace('px',"")); //returns a string of the margin style of that element
-    pager_div.style.width = parseInt((liWidth + liMargin * 2) * imageNumber) + 'px'; //calculates the total needed width of the pager
-}
+    //returns an object of all styling for that object
+    var computedStyle = document.defaultView.getComputedStyle(li, null); 
 
+    //will set border width 1px; offsetWidth = 22
+    //1. grabs the width of the last li added to width
+    //2. returns a string of the margin style of that element
+    var liWidth = parseInt(li.offsetWidth); 
+    var liMargin = parseInt(computedStyle.margin.replace('px',"")); 
+
+    //calculates the total needed width of the pager
+    pager_div.style.width = parseInt((liWidth + liMargin * 2) * imageNumber) + 'px'; 
+
+    //Highlight first pager button be default.
+    var pager = document.getElementById('pager');
+    pager_children = pager.children;
+    pager_children[0].style.opacity = "0.9";
+}
 
 
 //Onload run start function.

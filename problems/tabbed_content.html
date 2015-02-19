@@ -4,6 +4,7 @@
 	<title>Frontend Coding Test</title>
 	<link type="text/css" rel="stylesheet" href="../css/style.css" />
 	<style type="text/css">
+
 		.picture {
 			background-color: #F9F9F9;
 			border: 1px solid #CCCCCC; padding: 3px;
@@ -35,7 +36,7 @@
 			border-bottom: 2px solid rgb(96, 96, 109);
 			border-top-left-radius: 5px;
 			border-top-right-radius: 5px;
-			margin: -2px;
+			margin: -1px;
 			padding: 0px;
 		}
 
@@ -73,10 +74,7 @@
 
 		<div id="container">
 
-			<div>
-				<div class="tabs 1 active" onclick="loadText(1)"><h3>Tab 1</h3></div>
-				<div class="tabs 2" onclick="loadText(2)"><h3>Tab 2</h3></div>
-				<div class="tabs 3" onclick="loadText(3)"><h3>Tab 3</h3></div>
+			<div id="tab_bar">
 			</div>
 
 			
@@ -111,9 +109,47 @@
 		document.getElementsByClassName('tabs ' + tab)[0].className += ' active';
 		document.getElementsByClassName('text')[0].innerHTML = tabText[tab - 1];
 	}
+
+	//dynamic tab creation based on amount of data to display. So if more data is added to tabText, more tabs will be made.
+	function generate_tabs(num_of_tabs){    
+	    var tab_number;
+	    var tabs_div = document.getElementById('tab_bar');
+
+	    //loop until specified number of tabs is made
+	    for (i = 0; i < num_of_tabs; i++){
+
+	    	//1. create h3 element.
+	    	//2. create div element.
+	    	//3. create text for tab.
+	    	//4. insert text into h3 and then the h3 into the div.
+	    	//5. append the new div to the tab_bar
+	        var h3 = document.createElement('h3');
+	        var div = document.createElement('div');
+	        tab_number = document.createTextNode("Tab " + (i + 1));
+	        h3.appendChild(tab_number);
+	        div.appendChild(h3);
+	        tabs_div.appendChild(div);
+
+	        //set attributes for the new tab
+	        if(i === 0){
+	        	div.setAttribute("class", "tabs " + (i+1) + " active");
+	        }
+	        else{
+	        	div.setAttribute("class", "tabs " + (i+1) );
+	        }
+
+	        // add event inside a loop, closure issue.
+	        div.onclick = function(i){
+	            return function(){
+	                loadText(i + 1);
+	            }
+	        }(i);
+	    }   
+	}
+
+	//make your tabs.
+	generate_tabs(tabText.length);
 	
-
-
 	</script>
 </body>
 </html>
